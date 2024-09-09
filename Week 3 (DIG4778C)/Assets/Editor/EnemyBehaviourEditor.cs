@@ -6,48 +6,65 @@ using System.Linq;
 
 [CustomEditor(typeof(EnemyBehaviour)), CanEditMultipleObjects]
 public class EnemyBehaviourEditor : Editor
+
+{
+        
+    public override void OnInspectorGUI()
     {
-        public override void OnInspectorGUI()
+        base.OnInspectorGUI();
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Select all enemies"))
         {
-            base.OnInspectorGUI();
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("Select all enemies"))
-            {
-                var allEnemyBehaviour = GameObject.FindObjectsOfType<EnemyBehaviour>();
-                var allEnemyGameObjects = allEnemyBehaviour.Select(enemy => enemy.gameObject).ToArray();
-                Selection.objects = allEnemyGameObjects;
-            }
+            var allEnemyBehaviour = GameObject.FindObjectsOfType<EnemyBehaviour>();
+            var allEnemyGameObjects = allEnemyBehaviour.Select(enemy => enemy.gameObject).ToArray();
+            Selection.objects = allEnemyGameObjects;
+        }
 
-            if (GUILayout.Button("Clear selection"))
-            {
-                Selection.objects = new Object[] { (target as EnemyBehaviour).gameObject };
-            }
-            EditorGUILayout.EndHorizontal();
+        if (GUILayout.Button("Clear selection"))
+        {
+            Selection.objects = new Object[] { (target as EnemyBehaviour).gameObject };
+        }
+        EditorGUILayout.EndHorizontal();
 
-            var cachedColor = GUI.backgroundColor;
+
+        bool allEnemiesEnabled = GameObject.FindObjectsOfType<EnemyBehaviour>(true).All(enemy => enemy.gameObject.activeSelf);
+
+        var cachedColor = GUI.backgroundColor;
+        GUI.backgroundColor = Color.green;
+        if (allEnemiesEnabled)
+        {
             GUI.backgroundColor = Color.green;
-            if (GUILayout.Button("Disable/Enable all enemy", GUILayout.Height(40)))
-            {
-                foreach (var enemy in GameObject.FindObjectsOfType<EnemyBehaviour>(true))
-                    {
-                    enemy.gameObject.SetActive(!enemy.gameObject.activeSelf);
-                    }
-            }
-            GUI.backgroundColor = cachedColor;
+        }
+        else
+        {
+            GUI.backgroundColor = Color.red;
+        }
+        
 
-            {
-                EnemyBehaviour enemyBehaviour = (EnemyBehaviour)target;
-
-                if (enemyBehaviour.cubeSize < 2)
+        if (GUILayout.Button("Disable/Enable all enemy", GUILayout.Height(40)))
+        {
+            foreach (var enemy in GameObject.FindObjectsOfType<EnemyBehaviour>(true))
                 {
-                    EditorGUILayout.HelpBox("Cube Size cannot be smaller than 2", MessageType.Warning);
+                enemy.gameObject.SetActive(!enemy.gameObject.activeSelf);
                 }
+        }
 
-                if (enemyBehaviour.sphereRadius < 1)
-                {
-                    EditorGUILayout.HelpBox("Sphere Radius cannot be smaller than 2", MessageType.Warning);
-                }
+        GUI.backgroundColor = cachedColor;
 
+        {
+
+            EnemyBehaviour enemyBehaviour = (EnemyBehaviour)target;
+
+            if (enemyBehaviour.cubeSize < 2)
+            {
+                EditorGUILayout.HelpBox("Cube Size cannot be smaller than 2", MessageType.Warning);
             }
+
+            if (enemyBehaviour.sphereRadius < 1)
+            {
+                EditorGUILayout.HelpBox("Sphere Radius cannot be smaller than 2", MessageType.Warning);
+            }
+
         }
     }
+}
